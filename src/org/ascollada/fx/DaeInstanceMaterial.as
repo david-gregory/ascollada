@@ -45,7 +45,7 @@ package org.ascollada.fx {
 			super.read(element);
 			
 			this.symbol = readAttribute(element, "symbol");
-			this.target = readAttribute(element, "target");
+			this.target = readAttribute(element, "target", true);
 			this.bind_vertex_input = new Array();
 			
 			var list :XMLList = element["bind_vertex_input"];

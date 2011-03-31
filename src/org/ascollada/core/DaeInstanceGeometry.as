@@ -44,7 +44,7 @@ package org.ascollada.core {
 		override public function read(element : XML) : void {
 			super.read(element);
 			
-			this.url = readAttribute(element, "url");
+			this.url = readAttribute(element, "url", true);
 			
 			var list : XMLList = element["bind_material"];
 			if(list.length()) {
