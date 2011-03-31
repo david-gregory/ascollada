@@ -1,3 +1,15 @@
+David Gregory's fork Notes:
+---------------------------
+
+This fork of Tim Knip's ASCollada was created to put in place a couple of things.
+
+a) minor bug fixes.
+b) a conversion from AS3 Arrays to Vectors, where appropriate. will try to use fixed length vectors where that is possible.
+
+Tim Knip's original README
+--------------------------
+* This explains how to use bootstrap ASCollada and begin parsing a collada document.
+
 /** 
  *
  */
