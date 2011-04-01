@@ -9,7 +9,13 @@ package org.ascollada.core {
 	public class DaeSource extends DaeElement {
 		use namespace collada;
 		
-		public var data : Array;
+		// Notes:
+		// * only one of dataFloat, dataString, dataInt, dataBool will be allocated.
+		// * the inside Vector will be accessor.stride elements long. this includes 1 stride accessors (which may seem odd)
+		public var dataFloat : Vector.<Vector.<Number>>;
+		public var dataString : Vector.<Vector.<String>>;
+		public var dataInt : Vector.<Vector.<uint>>;
+		public var dataBool : Vector.<Vector.<Boolean>>;
 		public var dataType : String;
 		public var accessor : DaeAccessor;
 		public var channels : Vector.<DaeChannel>; // externally assigned in DaeDocument
@@ -26,7 +32,10 @@ package org.ascollada.core {
 		 */
 		override public function destroy() : void {
 			super.destroy();
-			this.data = null;
+			this.dataFloat = null;
+			this.dataString = null;
+			this.dataInt = null;
+			this.dataBool = null;
 			this.dataType = null;
 			if(this.accessor) {
 				this.accessor.destroy();
@@ -45,30 +54,31 @@ package org.ascollada.core {
 			this.dataType = "float_array";
 			
 			var list : XMLList = element[this.dataType];
+			var stringData : Array;
 			
 			// read in the raw data
 			if(list.length()) {
-				this.data = readStringArray(list[0]);
+				stringData = readStringArray(list[0]);
 			} else {
 				this.dataType = "Name_array";
 				list = element[this.dataType];
 				if(list.length()) {
-					this.data = readStringArray(list[0]);
+					stringData = readStringArray(list[0]);
 				} else {
 					this.dataType = "IDREF_array";
 					list = element[this.dataType];
 					if(list.length()) {
-						this.data = readStringArray(list[0]);
+						stringData = readStringArray(list[0]);
 					} else {
 						this.dataType = "int_array";
 						list = element[this.dataType];
 						if(list.length()) {
-							this.data = readStringArray(list[0]);
+							stringData = readStringArray(list[0]);
 						} else {
 							this.dataType = "bool_array";
 							list = element[this.dataType];
 							if(list.length()) {
-								this.data = readStringArray(list[0]);
+								stringData = readStringArray(list[0]);
 							} else {
 								throw new IllegalOperationError("DaeSource : no data found!");
 							}
@@ -84,61 +94,96 @@ package org.ascollada.core {
 				throw new Error("[DaeSource] could not find an accessor!");
 			}
 			
+			var i:int;
+			
 			// interleave data
-			var tmp :Array = new Array();
-			for(var i:int = 0; i < this.accessor.count; i++)
+			switch (this.dataType)
 			{
-				var arr :Array = readValue(i);
-				if(arr.length > 1)
-					tmp.push(arr);
-				else
-					tmp.push(arr[0]);
+				case "IDREF_array":
+				case "Name_array":
+					this.dataString = new Vector.<Vector.<String>>();
+					for(i = 0; i < this.accessor.count; i++) {
+						pushStringValues(stringData, i);
+					}
+					break;
+				case "bool_array":
+					this.dataBool = new Vector.<Vector.<Boolean>>();
+					for(i = 0; i < this.accessor.count; i++) {
+						pushBoolValues(stringData, i);
+					}
+					break;
+				case "float_array":
+					this.dataFloat = new Vector.<Vector.<Number>>();
+					for(i = 0; i < this.accessor.count; i++) {
+						pushFloatValues(stringData, i);
+					}
+					break;
+				case "int_array":
+					this.dataInt = new Vector.<Vector.<uint>>();
+					for(i = 0; i < this.accessor.count; i++) {
+						pushIntValues(stringData, i);
+					}
+					break;
 			}
-			this.data = tmp;
 		}
 		
 		/**
 		 * 
 		 */ 
-		private function readValue(index:int, forceType:Boolean=true):Array
-		{
-			var values :Array = new Array();
-			var data :Array = this.data;
-			var stride :int = this.accessor.stride;
-			var type :String = this.dataType;
-			var start :int = index * stride;
-			var value :String;
-			var i :int;
+		private function pushStringValues(stringData:Array, index:int):void {
+			var values : Vector.<String> = new Vector.<String>(); 
+			var start : int = index * this.accessor.stride;
+			var i : int;
 			
-			for(i = 0; i < stride; i++)
-			{
-				value = data[start + i];
-				if(forceType && (type == "bool_array" || type == "float_array" || type == "int_array"))
-				{
-					if(type == "float_array")
-					{
-						if(value.indexOf(",") != -1) 
-						{
-							value = value.replace(/,/, ".");
-						}
-						values.push(parseFloat(value));
-					}
-					else if(type == "bool_array")
-					{
-						values.push((value == "true" || value == "1" ? true : false));
-					}
-					else
-					{
-						values.push(parseInt(value, 10));
-					}
-				}
-				else
-				{
-					values.push(value);	
-				}
+			for(i = 0; i < this.accessor.stride; i++) {
+				var value : String = stringData[start + i];
+				values.push(value);
 			}
 			
-			return values;
+			this.dataString.push(values);
+		}
+		
+		private function pushBoolValues(stringData:Array, index:int):void {
+			var values : Vector.<Boolean> = new Vector.<Boolean>(); 
+			var start : int = index * this.accessor.stride;
+			var i : int;
+			
+			for(i = 0; i < this.accessor.stride; i++) {
+				var value : String = stringData[start + i];
+				values.push((value == "true" || value == "1" ? true : false));
+			}
+			
+			this.dataBool.push(values);
+		}
+		
+		private function pushFloatValues(stringData:Array, index:int):void {
+			var values : Vector.<Number> = new Vector.<Number>(); 
+			var start : int = index * this.accessor.stride;
+			var i : int;
+			
+			for(i = 0; i < this.accessor.stride; i++) {
+				var value : String = stringData[start + i];
+				if(value.indexOf(",") != -1) 
+				{
+					value = value.replace(/,/, ".");
+				}
+				values.push(parseFloat(value));
+			}
+			
+			this.dataFloat.push(values);
+		}
+
+		private function pushIntValues(stringData:Array, index:int):void {
+			var values : Vector.<uint> = new Vector.<uint>(); 
+			var start : int = index * this.accessor.stride;
+			var i : int;
+			
+			for(i = 0; i < this.accessor.stride; i++) {
+				var value : String = stringData[start + i];
+				values.push(parseInt(value, 10));
+			}
+			
+			this.dataInt.push(values);
 		}
 	}
 }

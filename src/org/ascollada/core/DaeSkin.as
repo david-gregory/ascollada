@@ -20,7 +20,7 @@ package org.ascollada.core {
 		/**
 		 * 
 		 */ 
-		public var joints : Array; // DaeSource.data (TODO: convert to Vector)
+		public var joints : Vector.<Vector.<String>>; // inside Vector is always 1 element long
 		
 		/**
 		 * 
@@ -119,18 +119,13 @@ package org.ascollada.core {
 			var bsource :DaeSource = this.document.sources[binput.source];
 			var i :int, j :int;
 			
-			this.joints = asource.data;
+			this.joints = asource.dataString;
 			this.inv_bind_matrix = new Vector.<DaeTransform>();
 			
-			for(i = 0; i < bsource.data.length; i++) {
+			for(i = 0; i < bsource.dataFloat.length; i++) {
 				var transform : DaeTransform = new DaeTransform(this.document);
 
-				// converting from Array to Vector here
-				// would like to eliminate this step
-				for(j = 0; j < bsource.data[i].length; j++) {
-					transform.data[j] = bsource.data[i][j];
-				}
-
+				transform.data = bsource.dataFloat[i];
 				transform.nodeName = "matrix";
 
 				this.inv_bind_matrix.push(transform);	
@@ -185,9 +180,9 @@ package org.ascollada.core {
 					var jidx:int = v[cur + ainput.offset];
 					var widx:int = v[cur + binput.offset];
 					
-					var weight :Number = bsource.data[widx];
+					var weight : Number = bsource.dataFloat[widx][0];
 					
-					tmp.push(new DaeBlendWeight(i, joints[jidx], weight));
+					tmp.push(new DaeBlendWeight(i, this.joints[jidx][0], weight));
 				
 					cur += inputCount;
 				}
