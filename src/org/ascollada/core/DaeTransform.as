@@ -10,13 +10,15 @@ package org.ascollada.core {
 		/**
 		 * 
 		 */
-		public var data : Array;
+		public var data : Vector.<Number>;
 		
 		/**
 		 * 
 		 */
 		public function DaeTransform(document : DaeDocument, element : XML = null) {
+			this.data = new Vector.<Number>();
 			super(document, element);
+			// this.nodeName contains the transform type (rotate, scale, translate, matrix, lookat, skew)
 		}
 		
 		/**
@@ -33,10 +35,10 @@ package org.ascollada.core {
 		override public function read(element : XML) : void {
 			super.read(element);
 			
-			this.data = readStringArray(element);
+			var stringData:Array = readStringArray(element);
 			
-			for(var i : int = 0; i < this.data.length; i++) {
-				this.data[i] = parseFloat(this.data[i]);
+			for(var i : int = 0; i < stringData.length; i++) {
+				this.data[i] = parseFloat(stringData[i]);
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 package org.ascollada.core {
-	import org.ascollada.fx.DaeBindMaterial;	
 	import org.ascollada.core.ns.collada;
+	import org.ascollada.fx.DaeBindMaterial;
 	
 	/**
 	 * @author Tim Knip / floorplanner.com
@@ -16,7 +16,7 @@ package org.ascollada.core {
 		/**
 		 * 
 		 */
-		public var skeletons : Array;
+		public var skeletons : Vector.<String>;
 		
 		/**
 		 * 
@@ -61,7 +61,7 @@ package org.ascollada.core {
 			var i : int;
 			
 			this.url = readAttribute(element, "url", true);
-			this.skeletons = new Array();
+			this.skeletons = new Vector.<String>();
 			
 			for(i = 0; i < num; i++) {
 				child = list[i];

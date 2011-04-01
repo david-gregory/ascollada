@@ -15,7 +15,7 @@ package org.ascollada.core {
 		/**
 		 * 
 		 */
-		public var primitives : Array;
+		public var primitives : Vector.<DaePrimitive>;
 
 		/**
 		 * 
@@ -53,7 +53,7 @@ package org.ascollada.core {
 			var list : XMLList = element["vertices"];
 			var child : XML;
 			
-			this.primitives = new Array();
+			this.primitives = new Vector.<DaePrimitive>();
 			
 			if(list.length()) {
 				this.vertices = new DaeVertices(this.document, list[0]);

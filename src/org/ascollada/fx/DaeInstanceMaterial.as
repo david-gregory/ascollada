@@ -11,7 +11,7 @@ package org.ascollada.fx {
 		
 		public var symbol :String;
 		public var target :String;
-		public var bind_vertex_input :Array;
+		public var bind_vertex_input : Vector.<DaeBindVertexInput>;
 		
 		/**
 		 * 
@@ -46,7 +46,7 @@ package org.ascollada.fx {
 			
 			this.symbol = readAttribute(element, "symbol");
 			this.target = readAttribute(element, "target", true);
-			this.bind_vertex_input = new Array();
+			this.bind_vertex_input = new Vector.<DaeBindVertexInput>();
 			
 			var list :XMLList = element["bind_vertex_input"];
 			var i :int;

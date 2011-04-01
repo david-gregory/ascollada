@@ -1,5 +1,5 @@
 package org.ascollada.core {
-	import flash.errors.IllegalOperationError;	
+	import flash.errors.IllegalOperationError;
 	
 	import org.ascollada.core.ns.collada;
 
@@ -12,7 +12,7 @@ package org.ascollada.core {
 		public var data : Array;
 		public var dataType : String;
 		public var accessor : DaeAccessor;
-		public var channels : Array;
+		public var channels : Vector.<DaeChannel>; // externally assigned in DaeDocument
 		
 		/**
 		 * 
@@ -41,6 +41,7 @@ package org.ascollada.core {
 		override public function read(element : XML) : void {
 			super.read(element);
 			
+			this.channels = new Vector.<DaeChannel>();
 			this.dataType = "float_array";
 			
 			var list : XMLList = element[this.dataType];

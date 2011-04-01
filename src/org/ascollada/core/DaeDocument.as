@@ -281,12 +281,10 @@ package org.ascollada.core {
 			var node : DaeNode = getNodeByID(target);
 			
 			if(node) {
-				node.channels = node.channels || new Array();
 				node.channels.push(channel);
 			} else {
 				var source : DaeSource = this.sources[target];
 				if(source) {
-					source.channels = source.channels || new Array();
 					source.channels.push(channel);
 				} else {
 					trace("[DaeDocument#readAnimationChannel] : could not find target for animation channel! " + target + " " + source);

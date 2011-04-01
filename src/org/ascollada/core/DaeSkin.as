@@ -1,5 +1,5 @@
 package org.ascollada.core {
-	import flash.errors.IllegalOperationError;	
+	import flash.errors.IllegalOperationError;
 	
 	import org.ascollada.core.ns.collada;
 
@@ -15,22 +15,22 @@ package org.ascollada.core {
 		/**
 		 * 
 		 */ 
-		public var bind_shape_matrix :DaeTransform;
+		public var bind_shape_matrix : DaeTransform;
 		
 		/**
 		 * 
 		 */ 
-		public var joints :Array;
+		public var joints : Array; // DaeSource.data (TODO: convert to Vector)
 		
 		/**
 		 * 
 		 */ 
-		public var inv_bind_matrix :Array;
+		public var inv_bind_matrix : Vector.<DaeTransform>;
 		
 		/**
 		 * 
 		 */ 
-		public var vertex_weights :Array;
+		public var vertex_weights : Vector.<Vector.<DaeBlendWeight>>;
 		
 		/**
 		 * 
@@ -58,14 +58,13 @@ package org.ascollada.core {
 		/**
 		 * 
 		 */
-		public function getBlendWeightsForJoint(joint : String) : Array {
+		public function getBlendWeightsForJoint(joint : String) : Vector.<DaeBlendWeight> {
 			var i : int, j: int;
-			var result : Array = new Array();
+			var result : Vector.<DaeBlendWeight> = new Vector.<DaeBlendWeight>();
 			
 			for(i = 0; i < this.vertex_weights.length; i++) {
-				var arr : Array = this.vertex_weights[i];
-				for(j = 0; j < arr.length; j++) {
-					var bw : DaeBlendWeight = arr[j];
+				for(j = 0; j < this.vertex_weights[i].length; j++) {
+					var bw : DaeBlendWeight = this.vertex_weights[i][j];
 					if(bw.joint == joint) {
 						result.push(bw);
 					}
@@ -90,7 +89,7 @@ package org.ascollada.core {
 				this.bind_shape_matrix = new DaeTransform(this.document, list[0]);
 			} else {
 				this.bind_shape_matrix = new DaeTransform(this.document);
-				this.bind_shape_matrix.data = [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1];
+				this.bind_shape_matrix.data = Vector.<Number>([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
 			}
 			this.bind_shape_matrix.nodeName = "matrix";
 			
@@ -118,17 +117,22 @@ package org.ascollada.core {
 			var binput :DaeInput = new DaeInput(null, b);
 			var asource :DaeSource = this.document.sources[ainput.source];
 			var bsource :DaeSource = this.document.sources[binput.source];
-			var i :int;
+			var i :int, j :int;
 			
 			this.joints = asource.data;
-			this.inv_bind_matrix = new Array();
+			this.inv_bind_matrix = new Vector.<DaeTransform>();
 			
 			for(i = 0; i < bsource.data.length; i++) {
 				var transform : DaeTransform = new DaeTransform(this.document);
-				
-				transform.data = bsource.data[i];
+
+				// converting from Array to Vector here
+				// would like to eliminate this step
+				for(j = 0; j < bsource.data[i].length; j++) {
+					transform.data[j] = bsource.data[i][j];
+				}
+
 				transform.nodeName = "matrix";
-				
+
 				this.inv_bind_matrix.push(transform);	
 			}
 		}
@@ -170,12 +174,12 @@ package org.ascollada.core {
 			var vcount :Array = readStringArray(element["vcount"][0]);
 			var cur :int = 0;
 			
-			this.vertex_weights = new Array();
+			this.vertex_weights = new Vector.<Vector.<DaeBlendWeight>>();
 			
 			for(i = 0; i < vcount.length; i++) {
 				var vc:int = vcount[i];
 				
-				var tmp:Array = new Array();
+				var tmp:Vector.<DaeBlendWeight> = new Vector.<DaeBlendWeight>();
 					
 				for(j = 0; j < vc; j++) {
 					var jidx:int = v[cur + ainput.offset];

@@ -9,7 +9,7 @@ package org.ascollada.fx {
 	public class DaeBindMaterial extends DaeElement {
 		use namespace collada;
 		
-		public var instanceMaterials : Array;
+		public var instanceMaterials : Vector.<DaeInstanceMaterial>;
 		
 		/**
 		 * 
@@ -48,7 +48,7 @@ package org.ascollada.fx {
 			var list : XMLList = element..instance_material;
 			var child : XML;
 
-			this.instanceMaterials = new Array();
+			this.instanceMaterials = new Vector.<DaeInstanceMaterial>();
 			
 			for each(child in list) {
 				this.instanceMaterials.push(new DaeInstanceMaterial(this.document, child));

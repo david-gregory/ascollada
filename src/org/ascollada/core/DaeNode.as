@@ -10,7 +10,7 @@ package org.ascollada.core {
 		/**
 		 * 
 		 */
-		public var nodes : Array;
+		public var nodes : Vector.<DaeNode>; // children nodes
 		
 		/** */
 		public var type : String;
@@ -21,37 +21,32 @@ package org.ascollada.core {
 		/**
 		 * 
 		 */
-		public var transforms : Array;
+		public var transforms : Vector.<DaeTransform>;
 		
 		/**
 		 * 
 		 */
-		public var cameraInstances : Array;
+		public var cameraInstances : Vector.<DaeInstanceCamera>;
 		
 		/**
 		 * 
 		 */
-		public var controllerInstances : Array;
+		public var controllerInstances : Vector.<DaeInstanceController>;
 		
 		/**
 		 * 
 		 */
-		public var geometryInstances : Array;
+		public var geometryInstances : Vector.<DaeInstanceGeometry>;
 		
 		/**
 		 * 
 		 */
-		public var lightInstances : Array;
+		public var lightInstances : Vector.<DaeInstanceLight>;
 		
 		/**
 		 * 
 		 */
-		public var nodeInstances : Array;
-		
-		/**
-		 * 
-		 */
-		public var channels : Array;
+		public var channels : Vector.<DaeChannel>; // externally assigned in DaeDocument
 		
 		/**
 		 * 
@@ -121,15 +116,6 @@ package org.ascollada.core {
 				}
 				this.lightInstances = null;
 			}
-			
-			if(this.nodeInstances) {
-				while(this.nodeInstances.length) {
-					element = this.nodeInstances.pop() as DaeElement;
-					element.destroy();
-					element = null;
-				}
-				this.nodeInstances = null;
-			}
 		}
 
 		/**
@@ -181,13 +167,13 @@ package org.ascollada.core {
 			this.type = this.type.length == 0 ? "NODE" : this.type;
 			this.layer = readAttribute(element, "layer");
 			this.name = (this.name && this.name.length) ? this.name : this.id;
-			this.nodes = new Array();
-			this.transforms = new Array();
-			this.cameraInstances = new Array();
-			this.controllerInstances = new Array();
-			this.geometryInstances = new Array();
-			this.lightInstances = new Array();
-			this.nodeInstances = new Array();
+			this.nodes = new Vector.<DaeNode>();
+			this.transforms = new Vector.<DaeTransform>();
+			this.cameraInstances = new Vector.<DaeInstanceCamera>();
+			this.controllerInstances = new Vector.<DaeInstanceController>();
+			this.geometryInstances = new Vector.<DaeInstanceGeometry>();
+			this.lightInstances = new Vector.<DaeInstanceLight>();
+			this.channels = new Vector.<DaeChannel>();
 			
 			for(i = 0; i < num; i++) {
 				child = list[i];

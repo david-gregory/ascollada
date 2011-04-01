@@ -10,15 +10,15 @@ package org.ascollada.core {
 		/**
 		 * 
 		 */
-		public var animations : Array;
+		public var animations : Vector.<DaeAnimation>;
 		
 		/**
 		 * 
 		 */
-		public var channels : Array;
+		public var channels : Vector.<DaeChannel>;
 		
 		/** */
-		public var clips : Array;
+		public var clips : Vector.<DaeAnimationClip>; // (assigned in DaeAnimationClip)
 		
 		/**
 		 * 
@@ -62,8 +62,9 @@ package org.ascollada.core {
 			
 			this.id = (this.id && this.id.length) ? this.id : "animation" + (_newID++);
 			this.name = (this.name && this.name.length) ? this.name : this.id;
-			this.animations = new Array();
-			this.channels = new Array();
+			this.animations = new Vector.<DaeAnimation>();
+			this.channels = new Vector.<DaeChannel>();
+			this.clips = new Vector.<DaeAnimationClip>();
 			
 			var samplers : Object = new Object();
 			var sampler : DaeSampler;

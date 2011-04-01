@@ -25,17 +25,17 @@ package org.ascollada.core {
 		/**
 		 * 
 		 */
-		public var triangles : Array;
+		public var triangles : Vector.<Vector.<uint>>;
 		
 		/**
 		 * 
 		 */
-		public var texCoordInputs : Array;
+		public var texCoordInputs : Vector.<DaeInput>;
 		
 		/**
 		 * 
 		 */
-		public var uvSets : Object;
+		public var uvSets : Object; // adhoc dict - setNum -> Vector.<Vector.<uint>>
 		
 		/**
 		 * 
@@ -52,19 +52,19 @@ package org.ascollada.core {
 			super.destroy();
 			
 			var element : DaeElement;
-			if(texCoordInputs) {
-				while(texCoordInputs.length) {
-					element = texCoordInputs.pop() as DaeElement;
+			if(this.texCoordInputs) {
+				while(this.texCoordInputs.length) {
+					element = this.texCoordInputs.pop() as DaeElement;
 					element.destroy();
 					element = null;
 				}
-				texCoordInputs = null;
+				this.texCoordInputs = null;
 			}
 
-			uvSets = null;
-			triangles = null;
-			vertices = null;
-			material = null;
+			this.uvSets = null;
+			this.triangles = null;
+			this.vertices = null;
+			this.material = null;
 		}
 
 		/**
@@ -75,24 +75,23 @@ package org.ascollada.core {
 			
 			this.material = readAttribute(element, "material", true);
 			this.count = parseInt(readAttribute(element, "count"), 10);
-			this.triangles = new Array();
+			this.triangles = new Vector.<Vector.<uint>>();
 			this.uvSets = new Object();
-			this.texCoordInputs = new Array();
+			this.texCoordInputs = new Vector.<DaeInput>();
 			
 			var list : XMLList = element["input"];
 			var child : XML;
-			var input : DaeInput;
-			var inputs : Array = new Array();
+			var inputs : Vector.<DaeInput> = new Vector.<DaeInput>();
 			var maxOffset : int = 0;
 			
 			for each(child in list) {
-				input = new DaeInput(this.document, child);		
+				var input : DaeInput = new DaeInput(this.document, child);		
 				switch(input.semantic) {
 					case "VERTEX":
 						input.source = this.vertices.source.id;
 						break;
 					case "TEXCOORD":
-						this.uvSets[input.setnum] = new Array();
+						this.uvSets[input.setnum] = new Vector.<Vector.<uint>>();
 						this.texCoordInputs.push(input);
 						break;
 					default:
@@ -119,28 +118,21 @@ package org.ascollada.core {
 			}
 		}
 		
-		private function buildPolylist(primitive : XML, vcount:Array, inputs : Array, maxOffset : int) : void {
+		private function buildPolylist(primitive : XML, vcount:Array, inputs : Vector.<DaeInput>, maxOffset : int) : void {
 			var input : DaeInput;
 			var p : Array = readStringArray(primitive);
-			var i : int, j : int, index : int, pid : int = 0;
-			var tmpUV : Object = new Object();
+			var i : int, j : int, pid : int = 0;
 
-			for each(input in inputs) {
-				if(input.semantic == "TEXCOORD") {
-					tmpUV[input.setnum] = new Array();
-				}
-			}
-				
 			for(i = 0; i < vcount.length; i++) {
 				var numVerts : int = parseInt(vcount[i], 10);
-				var poly : Array = new Array();
+				var poly : Vector.<uint> = new Vector.<uint>();
 				var uvs : Object = new Object();
-				
+        
 				for(j = 0; j < numVerts; j++) {
 					for each(input in inputs) {
 						
-						uvs[input.setnum] = uvs[input.setnum] || new Array();
-						index = parseInt(p[pid + input.offset], 10);
+						uvs[input.setnum] = uvs[input.setnum] || new Vector.<uint>();
+						var index : uint = parseInt(p[pid + input.offset], 10);
 						
 						switch(input.semantic) {
 							case "VERTEX":
@@ -158,17 +150,15 @@ package org.ascollada.core {
 				
 				// simple triangulation
 				for(j = 1; j < poly.length - 1; j++) {
-					this.triangles.push([poly[0], poly[j], poly[j+1]]);
-					var uv : Array;
+					this.triangles.push(new Vector.<uint>([poly[0], poly[j], poly[j+1]]));
 					for(var o:String in uvs) {
-						uv = uvs[o];
-						this.uvSets[o].push([uv[0], uv[j], uv[j+1]]);
+						this.uvSets[o].push(new Vector.<uint>([uvs[o][0], uvs[o][j], uvs[o][j+1]]));
 					}
 				}
 			}
 		}
 		
-		private function buildTriangles(primitives : XMLList, inputs : Array, maxOffset : int) : void {
+		private function buildTriangles(primitives : XMLList, inputs : Vector.<DaeInput>, maxOffset : int) : void {
 			var input : DaeInput;
 			var primitive : XML;
 			var index : int;
@@ -177,15 +167,15 @@ package org.ascollada.core {
 			
 			for each(primitive in primitives) {
 				var p : Array = readStringArray(primitive);
-				var tri : Array = new Array();
+				var tri : Vector.<uint> = new Vector.<uint>();
 				var tmpUV : Object = new Object();
 				
 				for each(input in inputs) {
 					if(input.semantic == "TEXCOORD") {
-						tmpUV[input.setnum] = new Array();
+						tmpUV[input.setnum] = new Vector.<uint>();
 					}
 				}
-				
+        
 				while(i < p.length) {
 					for each(input in inputs) {
 						source = this.document.sources[input.source];
@@ -196,14 +186,14 @@ package org.ascollada.core {
 								tri.push(index);
 								if(tri.length == 3) {
 									this.triangles.push(tri);
-									tri = new Array();
+									tri = new Vector.<uint>();
 								}
 								break;
 							case "TEXCOORD":
 								tmpUV[input.setnum].push(index);
 								if(tmpUV[input.setnum].length == 3) {
 									this.uvSets[input.setnum].push(tmpUV[input.setnum]);
-									tmpUV[input.setnum] = new Array();
+									tmpUV[input.setnum] = new Vector.<uint>();
 								}
 								break;
 							case "NORMAL":
