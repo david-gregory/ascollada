@@ -30,6 +30,16 @@ package org.ascollada.core {
 		/**
 		 * 
 		 */
+		public var normals : Vector.<Vector.<uint>>;
+
+		/**
+		 *
+		 */
+		public var normalInput : DaeInput;
+		
+		/**
+		 * 
+		 */
 		public var texCoordInputs : Vector.<DaeInput>;
 		
 		/**
@@ -62,6 +72,8 @@ package org.ascollada.core {
 			}
 
 			this.uvSets = null;
+			this.normalInput = null;
+			this.normals = null;
 			this.triangles = null;
 			this.vertices = null;
 			this.material = null;
@@ -76,6 +88,7 @@ package org.ascollada.core {
 			this.material = readAttribute(element, "material", true);
 			this.count = parseInt(readAttribute(element, "count"), 10);
 			this.triangles = new Vector.<Vector.<uint>>();
+			this.normals = new Vector.<Vector.<uint>>();
 			this.uvSets = new Object();
 			this.texCoordInputs = new Vector.<DaeInput>();
 			
@@ -93,6 +106,9 @@ package org.ascollada.core {
 					case "TEXCOORD":
 						this.uvSets[input.setnum] = new Vector.<Vector.<uint>>();
 						this.texCoordInputs.push(input);
+						break;
+					case "NORMAL":
+						this.normalInput = input;
 						break;
 					default:
 						break;
@@ -127,6 +143,7 @@ package org.ascollada.core {
 				var numVerts : int = parseInt(vcount[i], 10);
 				var poly : Vector.<uint> = new Vector.<uint>();
 				var uvs : Object = new Object();
+				var normal : Vector.<uint> = new Vector.<uint>();
         
 				for(j = 0; j < numVerts; j++) {
 					for each(input in inputs) {
@@ -141,6 +158,8 @@ package org.ascollada.core {
 							case "TEXCOORD":
 								uvs[input.setnum].push(index);
 								break;
+							case "NORMAL":
+								normal.push(index);
 							default:
 								break;
 						}
@@ -154,6 +173,7 @@ package org.ascollada.core {
 					for(var o:String in uvs) {
 						this.uvSets[o].push(new Vector.<uint>([uvs[o][0], uvs[o][j], uvs[o][j+1]]));
 					}
+					this.normals.push(new Vector.<uint>([normal[0], normal[j], normal[j+1]]));
 				}
 			}
 		}
@@ -169,6 +189,7 @@ package org.ascollada.core {
 				var p : Array = readStringArray(primitive);
 				var tri : Vector.<uint> = new Vector.<uint>();
 				var tmpUV : Object = new Object();
+				var normal : Vector.<uint> = new Vector.<uint>();
 				
 				for each(input in inputs) {
 					if(input.semantic == "TEXCOORD") {
@@ -197,6 +218,11 @@ package org.ascollada.core {
 								}
 								break;
 							case "NORMAL":
+								normal.push(index);
+								if(normal.length == 3) {
+									this.normals.push(normal);
+									normal = new Vector.<uint>();
+								}
 								break;
 							default:
 								break;
