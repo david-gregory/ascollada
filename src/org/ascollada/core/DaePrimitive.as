@@ -38,14 +38,17 @@ package org.ascollada.core {
 		public var normalInput : DaeInput;
 		
 		/**
-		 * 
+		 * Use the interface getTexCoordInput(setNum) to access the proper DaeInput.  See Note below as to why.
 		 */
-		public var texCoordInputs : Vector.<DaeInput>;
+		private var texCoordInputs : Vector.<DaeInput>; // looked up via input_set
 		
 		/**
-		 * 
+		 * Use the interface getUVSet(setNum) to access the proper uv's.
+		 * This structure is private because looking up by set number isn't always the correct way to look up uv's.
+		 * When there is only one set, the Collada spec says that set num may not be specified.  We've seen examples
+		 * of Collada exported that contained an input_set=1 reference when there was only one set of uv's.
 		 */
-		public var uvSets : Object; // adhoc dict - setNum -> Vector.<Vector.<uint>>
+		private var uvSets : Object; // adhoc dict - setNum -> Vector.<Vector.<uint>>
 		
 		/**
 		 * 
@@ -131,6 +134,38 @@ package org.ascollada.core {
 				default:
 					//trace("don't know how to process primitives of type : " + this.nodeName);
 					break;
+			}
+		}
+		
+		public function getTexCoordInput(requestedSetNum:int):DaeInput
+		{
+			// if there's only one DaeInput for uv's, return that one. 
+			if (this.texCoordInputs.length == 1)
+			{
+				return this.texCoordInputs[0];
+			}
+			else
+			{
+				return this.texCoordInputs[requestedSetNum];
+			}
+		}
+		
+		public function getUVSet(requestedSetNum:int):Vector.<Vector.<uint>>
+		{
+			var numUVSets : uint;
+			for each (var o:* in this.uvSets)
+			{
+				numUVSets++;
+			}
+			
+			// if there's only one uvIndex vector, return that one. 
+			if (numUVSets == 1)
+			{
+				return this.uvSets[0];
+			}
+			else
+			{
+				return this.uvSets[requestedSetNum];
 			}
 		}
 		

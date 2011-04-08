@@ -80,7 +80,7 @@ package org.ascollada.core {
 		override public function read(element : XML) : void {
 			super.read(element);
 			
-			this.source = readAttribute(element, "source");
+			this.source = readAttribute(element, "source", true);
 			
 			var list : XMLList = element["bind_shape_matrix"];
 			
