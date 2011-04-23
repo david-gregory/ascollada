@@ -161,14 +161,16 @@ package org.ascollada.core {
 			
 			parent = parent || this.scene;
 			
-			if(parent.id == id) {
-				return parent;
-			}
-			
-			for each(child in parent.nodes) {
-				var node : DaeNode = getNodeByID(id, child);
-				if(node) {
-					return node;	
+			if(parent) {
+				if(parent.id == id) {
+					return parent;
+				}
+				
+				for each(child in parent.nodes) {
+					var node : DaeNode = getNodeByID(id, child);
+					if(node) {
+						return node;	
+					}
 				}
 			}
 			
@@ -183,14 +185,16 @@ package org.ascollada.core {
 			
 			parent = parent || this.scene;
 			
-			if(parent.name == name) {
-				return parent;
-			}
-			
-			for each(child in parent.nodes) {
-				var node : DaeNode = getNodeByName(name, child);
-				if(node) {
-					return node;	
+			if(parent) {
+				if(parent.name == name) {
+					return parent;
+				}
+				
+				for each(child in parent.nodes) {
+					var node : DaeNode = getNodeByName(name, child);
+					if(node) {
+						return node;	
+					}
 				}
 			}
 			
@@ -286,8 +290,6 @@ package org.ascollada.core {
 				var source : DaeSource = this.sources[target];
 				if(source) {
 					source.channels.push(channel);
-				} else {
-					trace("[DaeDocument#readAnimationChannel] : could not find target for animation channel! " + target + " " + source);
 				}
 			}
 		}
@@ -492,8 +494,6 @@ package org.ascollada.core {
 				if(list.length()) {
 					this.scene = new DaeNode(this, list[0]);
 				}
-			} else {
-				trace("Could not find any scene!");
 			}
 		}
 
