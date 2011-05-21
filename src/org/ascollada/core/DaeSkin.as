@@ -55,6 +55,25 @@ package org.ascollada.core {
 			this.vertex_weights = null;
 		}
 
+    /**
+     * 
+     */
+    public function getBlendWeightsForVertexIndex(vertexIndex : int) : Vector.<DaeBlendWeight> {
+      var i : int, j: int;
+      var result : Vector.<DaeBlendWeight> = new Vector.<DaeBlendWeight>();
+      
+      for(i = 0; i < this.vertex_weights.length; i++) {
+        for(j = 0; j < this.vertex_weights[i].length; j++) {
+          var bw : DaeBlendWeight = this.vertex_weights[i][j];
+          if(bw.vertexIndex == vertexIndex) {
+            result.push(bw);
+          }
+        }
+      }
+      
+      return result;
+    }
+    
 		/**
 		 * 
 		 */

@@ -179,7 +179,7 @@ package org.ascollada.core {
 				var poly : Vector.<uint> = new Vector.<uint>();
 				var uvs : Object = new Object();
 				var normal : Vector.<uint> = new Vector.<uint>();
-        
+				
 				for(j = 0; j < numVerts; j++) {
 					for each(input in inputs) {
 						
@@ -204,11 +204,23 @@ package org.ascollada.core {
 				
 				// simple triangulation
 				for(j = 1; j < poly.length - 1; j++) {
-					this.triangles.push(new Vector.<uint>([poly[0], poly[j], poly[j+1]]));
+					var indicesVec:Vector.<uint> = new Vector.<uint>(3);
+					indicesVec[0] = poly[0];
+					indicesVec[1] = poly[j];
+					indicesVec[2] = poly[j+1];
+					this.triangles.push(indicesVec);
 					for(var o:String in uvs) {
-						this.uvSets[o].push(new Vector.<uint>([uvs[o][0], uvs[o][j], uvs[o][j+1]]));
+						var uvsVec:Vector.<uint> = new Vector.<uint>(3);
+						uvsVec[0] = uvs[o][0];
+						uvsVec[1] = uvs[o][j];
+						uvsVec[2] = uvs[o][j+1];
+						this.uvSets[o].push(uvsVec);
 					}
-					this.normals.push(new Vector.<uint>([normal[0], normal[j], normal[j+1]]));
+					var normalsVec:Vector.<uint> = new Vector.<uint>(3);
+					normalsVec[0] = normal[0];
+					normalsVec[1] = normal[j];
+					normalsVec[2] = normal[j+1];
+					this.normals.push(normalsVec);
 				}
 			}
 		}
@@ -231,7 +243,7 @@ package org.ascollada.core {
 						tmpUV[input.setnum] = new Vector.<uint>();
 					}
 				}
-        
+				
 				while(i < p.length) {
 					for each(input in inputs) {
 						source = this.document.sources[input.source];

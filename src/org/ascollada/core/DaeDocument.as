@@ -57,6 +57,15 @@ package org.ascollada.core {
 		/** */
 		public var nodes : Dictionary;
 		
+		/**
+		 * From Collada Spec - all collada data is by definition right-handed. However, the up axis is specified in the "asset" element.
+		 * Value   Right Axis   Up Axis      Inward Axis
+		 * X-UP    Negative y   Positive x   Positive z
+		 * Y_UP    Positive x   Positive y   Positive z
+		 * Z_UP    Positive x   Positive z   Negative y
+		 **/
+		public var up_axis : String;
+		
 		private var _elementQueue : Vector.<XML>;
 		private var _imageQueue : Vector.<DaeImage>;
 		private var _loadingImage : DaeImage;
@@ -410,6 +419,13 @@ package org.ascollada.core {
 		/**
 		 * 
 		 */
+		private function readAsset() : void {
+			up_axis = this.COLLADA.asset.up_axis[0];
+		}
+		
+		/**
+		 * 
+		 */
 		private function readLibraryNodes() : void {
 			var list : XMLList = this.COLLADA..library_nodes.node;
 			var element : XML;
@@ -467,6 +483,7 @@ package org.ascollada.core {
 				timer.start();
 			} else {
 				
+				readAsset();
 				readLibraryMaterials();
 				readLibraryEffects();
 				readLibraryControllers();
